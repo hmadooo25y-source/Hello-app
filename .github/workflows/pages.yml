@@ -1,0 +1,65 @@
+name: Deploy CardLab to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract zip and prepare site
+        run: |
+          set -euo pipefail
+          rm -rf _extract dist && mkdir _extract dist
+          ZIP=$(find . -maxdepth 2 -iname '*.zip' -not -path './.git/*' | head -n1 || true)
+          if [ -n "$ZIP" ]; then
+            echo "Extracting $ZIP"
+            unzip -q "$ZIP" -d _extract
+            SRC=$(dirname "$(find _extract -name index.html -not -path '*/__MACOSX/*' | head -n1)")
+          else
+            echo "No zip found, using repository files"
+            SRC=.
+          fi
+          [ -f "$SRC/index.html" ] || { echo "index.html not found"; exit 1; }
+          for f in index.html manifest.webmanifest sw.js icon-192.png icon-512.png; do
+            cp "$SRC/$f" dist/
+          done
+          ls -la dist
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4
+puts.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract zip and prepare site
+        run: |
+          set -euo pipefail
+          rm -rf _extract dist && mkdir _extract dist
+          ZIP=$(find . -maxdepth 2 -iname '*.zip' -not -path './.git/*' | head -n1 || true)
+          if [ -n "$ZIP" ]; then
+            echo "Extracting $ZIP"
+            unzip -q "$ZIP" -d _extract
+            SRC=$(dirname "$(find _extract -name index.html -not -path '*/__MACOSX/*' | head -n1)")
+          else
+            echo "No zip found, using repository files"
+            SRC=.
+          fi
+          [ -f "$SRC/index.html" ] || { echo "index.html not found"; exit 1; }
+          f
