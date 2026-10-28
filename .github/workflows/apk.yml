@@ -1,4 +1,4 @@
-name: Build CardLab APk
+name: Build CardLab APK
 on:
   workflow_dispatch:
   push:
@@ -41,7 +41,7 @@ jobs:
           mkdir app && cd app
           mv ../www ./www
           npm init -y
-          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
           npx cap init CardLab com.cardlab.app --web-dir www
           npx cap add android
           npx cap sync android
@@ -68,3 +68,33 @@ jobs:
         with:
           name: CardLab-APK
           path: app/android/app/build/outputs/apk/debug/app-debug.apk
+ipefail
+          mkdir app && cd app
+          mv ../www ./www
+          npm init -y
+          npm i @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/filesystem@6 @capacitor/share@6
+          npx cap init CardLab com.cardlab.app --web-dir www
+          npx cap add android
+          npx cap sync android
+
+      - name: Use app icon
+        run: |
+          set -euo pipefail
+          ICON="$GITHUB_WORKSPACE/app/www/icon-192.png"
+          cd app/android/app/src/main/res
+          for d in mipmap-*dpi; do
+            cp "$ICON" "$d/ic_launcher.png"
+            cp "$ICON" "$d/ic_launcher_round.png"
+            cp "$ICON" "$d/ic_launcher_foreground.png"
+          done
+          rm -rf mipmap-anydpi-v26
+
+      - name: Build debug APK
+        run: |
+          cd app/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+   
