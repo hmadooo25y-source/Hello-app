@@ -1,4 +1,4 @@
-name: Build CardLab APK
+name: Build CardLab AP
 on:
   workflow_dispatch:
   push:
