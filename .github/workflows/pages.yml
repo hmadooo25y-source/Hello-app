@@ -44,22 +44,3 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
-puts.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Extract zip and prepare site
-        run: |
-          set -euo pipefail
-          rm -rf _extract dist && mkdir _extract dist
-          ZIP=$(find . -maxdepth 2 -iname '*.zip' -not -path './.git/*' | head -n1 || true)
-          if [ -n "$ZIP" ]; then
-            echo "Extracting $ZIP"
-            unzip -q "$ZIP" -d _extract
-            SRC=$(dirname "$(find _extract -name index.html -not -path '*/__MACOSX/*' | head -n1)")
-          else
-            echo "No zip found, using repository files"
-            SRC=.
-          fi
-          [ -f "$SRC/index.html" ] || { echo "index.html not found"; exit 1; }
-          f
